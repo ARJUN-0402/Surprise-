@@ -1,0 +1,923 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Happy Birthday, Kannu!</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;700&family=Dancing+Script:wght@600;700&family=Playfair+Display:ital,wght@0,400;0,600;1,400&family=Quicksand:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+    <!-- AOS Animation Library -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+
+    <!-- Alpine.js -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    
+    <!-- Canvas Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'champagne': '#F7E7CE',
+                        'soft-rose': '#E6A4B4',
+                        'pearl': '#FDFCF5',
+                        'gold-accent': '#C5A059',
+                        'text-dark': '#4A4A4A',
+                        'glass': 'rgba(255, 255, 255, 0.3)',
+                        'glass-border': 'rgba(255, 255, 255, 0.5)',
+                    },
+                    fontFamily: {
+                        'script': ['"Dancing Script"', 'cursive'],
+                        'serif': ['"Playfair Display"', 'serif'],
+                        'body': ['"Quicksand"', 'sans-serif'],
+                        'handwritten': ['"Caveat"', 'cursive'],
+                    },
+                    animation: {
+                        'float': 'float 6s ease-in-out infinite',
+                        'marquee': 'marquee 25s linear infinite',
+                        'shake': 'shake 0.82s cubic-bezier(.36,.07,.19,.97) both infinite',
+                        'ping': 'ping 1s cubic-bezier(0, 0, 0.2, 1) infinite',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-20px)' },
+                        },
+                        marquee: {
+                            '0%': { transform: 'translateX(0%)' },
+                            '100%': { transform: 'translateX(-100%)' },
+                        },
+                        shake: {
+                            '10%, 90%': { transform: 'translate3d(-1px, 0, 0)' },
+                            '20%, 80%': { transform: 'translate3d(2px, 0, 0)' },
+                            '30%, 50%, 70%': { transform: 'translate3d(-4px, 0, 0)' },
+                            '40%, 60%': { transform: 'translate3d(4px, 0, 0)' }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Custom Cursor */
+        body { cursor: none; }
+        .custom-cursor {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #E6A4B4;
+            border-radius: 50%;
+            position: fixed;
+            pointer-events: none;
+            z-index: 9999;
+            transition: transform 0.1s;
+            mix-blend-mode: multiply;
+        }
+        .custom-cursor.active {
+            transform: scale(1.5);
+            background-color: rgba(230, 164, 180, 0.2);
+        }
+
+        /* Glassmorphism Utilities */
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
+        }
+
+        /* Envelope Animation */
+        .envelope-wrapper {
+            perspective: 1000px;
+        }
+        .envelope {
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.6s;
+        }
+        .envelope-flap {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 50%;
+            background-color: #E6A4B4;
+            clip-path: polygon(0 0, 100% 0, 50% 100%);
+            transform-origin: top;
+            transition: transform 0.4s 0.4s, z-index 0.2s 0.4s;
+            z-index: 3;
+        }
+        .envelope-body {
+            background-color: #F4C2C2;
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 2;
+            clip-path: polygon(0 0, 50% 50%, 100% 0, 100% 100%, 0 100%);
+        }
+        .letter {
+            position: absolute;
+            bottom: 0;
+            left: 5%;
+            width: 90%;
+            height: 90%;
+            background: white;
+            transition: transform 0.6s 0.8s;
+            z-index: 1;
+            padding: 20px;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+        }
+        .open .envelope-flap {
+            transform: rotateX(180deg);
+            z-index: 0;
+        }
+        .open .letter {
+            transform: translateY(-60%);
+            z-index: 4;
+        }
+
+        /* Gift Box */
+        .gift-box {
+            transform-style: preserve-3d;
+            transition: transform 0.5s;
+        }
+        .gift-box:hover {
+            transform: scale(1.05);
+        }
+
+        /* Flower Animation */
+        .flower-btn { transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1); }
+        .flower-btn.collected {
+            transform: translate(var(--tx), var(--ty)) scale(0.5) rotate(360deg);
+            opacity: 0;
+        }
+        
+        /* Floating Bubbles */
+        .float-bubble { animation: floatBubble 4s ease-in-out infinite; }
+        @keyframes floatBubble {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+    </style>
+</head>
+<body class="bg-pearl text-text-dark font-body antialiased overflow-x-hidden selection:bg-soft-rose selection:text-white" x-data="birthdayApp()" @scroll.window="showTop = (window.pageYOffset > 300)">
+
+    <!-- Custom Cursor -->
+    <div id="cursor" class="custom-cursor hidden md:block"></div>
+
+    <!-- Floating Music Toggle -->
+    <div class="fixed top-6 right-6 z-50">
+        <button @click="toggleMusic" class="glass-panel w-12 h-12 rounded-full flex items-center justify-center text-soft-rose hover:scale-110 transition duration-300">
+            <span x-text="musicPlaying ? '⏸' : '🎵'"></span>
+        </button>
+        <audio id="bgMusic" loop>
+            <source src="music.mp3" type="audio/mpeg">
+        </audio>
+    </div>
+
+    <!-- Back to Top Button -->
+    <button x-show="showTop" @click="window.scrollTo({top: 0, behavior: 'smooth'})" class="fixed bottom-6 left-6 z-40 bg-white/80 backdrop-blur text-gold-accent p-3 rounded-full shadow-lg hover:scale-110 transition duration-300 border border-gold-accent/30" x-transition:enter="transition ease-out duration-300" x-transition:enter-start="opacity-0 translate-y-10" x-transition:enter-end="opacity-100 translate-y-0" x-transition:leave="transition ease-in duration-300" x-transition:leave-start="opacity-100 translate-y-0" x-transition:leave-end="opacity-0 translate-y-10">
+        <!-- Paper Plane Icon -->
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 transform -rotate-45 translate-x-1 translate-y-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+        </svg>
+    </button>
+
+    <!-- Background Gradients -->
+    <div class="fixed inset-0 -z-10">
+        <div class="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-champagne via-pearl to-soft-rose opacity-50"></div>
+        <div class="absolute top-[-10%] right-[-10%] w-96 h-96 bg-soft-rose rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-float"></div>
+        <div class="absolute bottom-[-10%] left-[-10%] w-96 h-96 bg-gold-accent rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-float" style="animation-delay: 2s"></div>
+    </div>
+
+    <main class="relative">
+
+        <!-- Hero Section -->
+        <section class="min-h-screen flex flex-col items-center justify-center text-center px-4 pt-20 pb-10">
+            
+            <!-- Photo Placeholder -->
+            <div class="relative w-64 h-64 md:w-72 md:h-72 mb-8 group" data-aos="zoom-in" data-aos-duration="1500">
+                <div class="absolute inset-0 bg-gold-accent rounded-full blur-xl opacity-40 group-hover:opacity-60 transition duration-500"></div>
+                <img src="kannu.jpg" 
+                     alt="Birthday Girl" 
+                     class="relative w-full h-full object-cover rounded-full border-4 border-white/80 shadow-2xl transform transition duration-500 hover:scale-105">
+            </div>
+
+            <h1 class="font-serif italic text-5xl md:text-7xl text-text-dark mb-4" data-aos="fade-up" data-aos-delay="200">
+                Happy Birthday, Kannu 🎈
+            </h1>
+            <p class="text-lg md:text-xl text-gray-600 max-w-xl font-medium mb-12" data-aos="fade-up" data-aos-delay="400">
+                The world is better with you in it <br>
+                <span class="text-sm italic text-soft-rose">(even when you're mad at me)</span>
+            </p>
+
+            <!-- Interactive Love Letter Envelope -->
+            <div class="relative w-72 h-48 cursor-pointer" @click="openEnvelope" :class="{ 'open': envelopeOpen }" data-aos="fade-up" data-aos-delay="600">
+                <div class="envelope-wrapper w-full h-full">
+                    <div class="envelope w-full h-full bg-soft-rose shadow-xl rounded-b-lg">
+                        <div class="envelope-flap"></div>
+                        <div class="envelope-body flex items-center justify-center">
+                            <span class="text-white text-2xl opacity-80">💌</span>
+                        </div>
+                        <div class="letter rounded-lg flex flex-col items-center justify-center text-center border border-gold-accent/20">
+                            <h3 class="font-script text-2xl text-soft-rose mb-2">My Apology & Love</h3>
+                            <p class="text-xs text-gray-600 leading-relaxed">
+                                I know things have been tense, and I'm sorry. But today is about YOU. You are my favorite person, and I promise to make it up to you. <br>
+                                <strong>I love you.</strong>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <p class="mt-8 text-sm text-gray-400 uppercase tracking-widest animate-pulse">Tap to Open</p>
+            </div>
+        </section>
+
+        <!-- Infinite Scroll Compliment Banner -->
+        <div class="bg-soft-rose/10 border-y border-soft-rose/20 py-4 overflow-hidden relative">
+            <div class="whitespace-nowrap animate-marquee flex gap-8 items-center">
+                <span class="text-2xl font-script text-soft-rose">My Queen 👑</span>
+                <span class="text-xl text-gold-accent">•</span>
+                <span class="text-2xl font-script text-soft-rose">Best Friend 💖</span>
+                <span class="text-xl text-gold-accent">•</span>
+                <span class="text-2xl font-script text-soft-rose">Beautiful Soul ✨</span>
+                <span class="text-xl text-gold-accent">•</span>
+                <span class="text-2xl font-script text-soft-rose">Smartest Woman I Know 🧠</span>
+                <span class="text-xl text-gold-accent">•</span>
+                <span class="text-2xl font-script text-soft-rose">My Everything 🌍</span>
+                <span class="text-xl text-gold-accent">•</span>
+                <!-- Duplicate for seamless loop -->
+                <span class="text-2xl font-script text-soft-rose">My Queen 👑</span>
+                <span class="text-xl text-gold-accent">•</span>
+                <span class="text-2xl font-script text-soft-rose">Best Friend 💖</span>
+                <span class="text-xl text-gold-accent">•</span>
+                <span class="text-2xl font-script text-soft-rose">Beautiful Soul ✨</span>
+                <span class="text-xl text-gold-accent">•</span>
+                <span class="text-2xl font-script text-soft-rose">Smartest Woman I Know 🧠</span>
+                <span class="text-xl text-gold-accent">•</span>
+                <span class="text-2xl font-script text-soft-rose">My Everything 🌍</span>
+            </div>
+        </div>
+
+        <!-- Time Since Birth Counter -->
+        <section class="py-12 bg-white/30 backdrop-blur-sm text-center" data-aos="fade-up">
+            <h2 class="font-serif text-3xl md:text-4xl text-text-dark mb-8">Since the angel came into existence</h2>
+            <div class="flex flex-wrap justify-center gap-4 md:gap-12 px-4">
+                <div class="glass-panel p-4 rounded-xl w-24 md:w-32 flex flex-col items-center">
+                    <span class="text-2xl md:text-4xl font-bold text-soft-rose" x-text="timeElapsed.days">0</span>
+                    <span class="text-xs uppercase tracking-widest text-gray-500 mt-1">Days</span>
+                </div>
+                <div class="glass-panel p-4 rounded-xl w-24 md:w-32 flex flex-col items-center">
+                    <span class="text-2xl md:text-4xl font-bold text-soft-rose" x-text="timeElapsed.hours">0</span>
+                    <span class="text-xs uppercase tracking-widest text-gray-500 mt-1">Hours</span>
+                </div>
+                <div class="glass-panel p-4 rounded-xl w-24 md:w-32 flex flex-col items-center">
+                    <span class="text-2xl md:text-4xl font-bold text-soft-rose" x-text="timeElapsed.minutes">0</span>
+                    <span class="text-xs uppercase tracking-widest text-gray-500 mt-1">Minutes</span>
+                </div>
+                <div class="glass-panel p-4 rounded-xl w-24 md:w-32 flex flex-col items-center">
+                    <span class="text-2xl md:text-4xl font-bold text-soft-rose" x-text="timeElapsed.seconds">0</span>
+                    <span class="text-xs uppercase tracking-widest text-gray-500 mt-1">Seconds</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- 1. Our Beautiful Journey (Interactive Map) -->
+        <section class="py-24 px-4 max-w-4xl mx-auto relative overflow-hidden">
+            <h2 class="font-serif text-4xl text-center text-text-dark mb-16" data-aos="fade-up">Our Beautiful Journey</h2>
+            
+            <!-- Vertical Path Line -->
+            <div class="absolute left-4 md:left-1/2 transform md:-translate-x-1/2 h-full w-1 bg-gradient-to-b from-transparent via-soft-rose to-transparent border-r-2 border-dashed border-soft-rose/50"></div>
+            
+            <!-- Moving Heart Icon (Sticky Effect) -->
+            <div class="sticky top-1/2 left-4 md:left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-10 text-3xl animate-pulse drop-shadow-lg">
+                💖
+            </div>
+
+            <!-- Memory Bubble 1 (Left) -->
+            <div class="relative flex flex-col md:flex-row justify-between items-center w-full mb-12 pl-12 md:pl-0">
+                <div class="w-full md:w-5/12 text-left md:text-right pr-0 md:pr-8" data-aos="fade-right" data-aos-offset="200">
+                    <div class="glass-panel p-6 rounded-full w-48 h-48 flex flex-col items-center justify-center mx-auto float-bubble hover:scale-105 transition duration-300">
+                        <span class="text-xs font-bold text-gold-accent uppercase tracking-widest">Day 1</span>
+                        <h3 class="font-serif text-2xl text-soft-rose mt-1">The Spark</h3>
+                        <p class="text-xs text-gray-500 mt-2 text-center leading-tight">When I first saw your smile, I knew I was in trouble.</p>
+                    </div>
+                </div>
+                <div class="hidden md:block w-5/12 pl-8"></div>
+            </div>
+
+            <!-- Memory Bubble 2 (Right) -->
+            <div class="relative flex flex-col md:flex-row justify-between items-center w-full mb-12 pl-12 md:pl-0">
+                <div class="hidden md:block w-5/12"></div>
+                <div class="w-full md:w-5/12 pl-0 md:pl-8 text-left" data-aos="fade-left" data-aos-offset="200">
+                    <div class="glass-panel p-6 rounded-full w-48 h-48 flex flex-col items-center justify-center mx-auto float-bubble hover:scale-105 transition duration-300" style="animation-delay: 1s;">
+                        <span class="text-xs font-bold text-gold-accent uppercase tracking-widest">Memories</span>
+                        <h3 class="font-serif text-2xl text-soft-rose mt-1">Adventures</h3>
+                        <p class="text-xs text-gray-500 mt-2 text-center leading-tight">Everything, every laugh, every moment with you is a treasure.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Special Bubble: The Bump (Left) -->
+            <div class="relative flex flex-col md:flex-row justify-between items-center w-full mb-24 pl-12 md:pl-0">
+                <div class="w-full md:w-5/12 text-left md:text-right pr-0 md:pr-8" data-aos="fade-right" data-aos-offset="200">
+                    <div class="glass-panel p-8 rounded-2xl border-2 border-soft-rose/50 shadow-[0_0_20px_rgba(230,164,180,0.3)] relative overflow-hidden group">
+                        <div class="absolute inset-0 bg-soft-rose/5 group-hover:bg-soft-rose/10 transition duration-500"></div>
+                        <h3 class="font-bold text-lg text-text-dark mb-2">A Small Bump in the Road</h3>
+                        <p class="text-sm text-gray-600 italic">
+                            "Even when things get tough, I’m still choosing you every single day. I'm sorry for my part in our recent distance, and I'm ready to make it up to you."
+                        </p>
+                    </div>
+                </div>
+                <div class="hidden md:block w-5/12 pl-8"></div>
+            </div>
+        </section>
+
+        <!-- Our Favorite Chapters (Polaroid Gallery) -->
+        <section class="py-24 px-4 max-w-7xl mx-auto" x-data="{ activePhoto: null, lightboxCaption: '' }">
+            <h2 class="font-serif text-4xl md:text-5xl text-center text-text-dark mb-16" data-aos="fade-up">Every moment with you is my favorite one</h2>
+            
+            <div class="flex flex-wrap justify-center gap-10 p-4">
+                
+                <!-- Photo 1 -->
+                <div class="w-full sm:w-[45%] md:w-[30%] relative group cursor-pointer" @click="activePhoto = 'gallery1.jpg'; lightboxCaption = 'Just being silly'" data-aos="fade-up">
+                    <div class="absolute -top-4 left-1/2 -translate-x-1/2 w-32 h-8 bg-white/30 backdrop-blur-sm border-l border-r border-white/50 rotate-[-2deg] z-20 shadow-sm opacity-80"></div>
+                    <div class="bg-white p-3 pb-16 shadow-xl transform rotate-2 group-hover:rotate-0 group-hover:scale-105 transition-all duration-500 ease-out relative overflow-hidden rounded-sm">
+                        <img src="gallery1.jpg" class="w-full h-auto object-cover filter sepia-[.2] group-hover:sepia-0 transition duration-500">
+                        <p class="font-handwritten text-3xl text-gray-600 text-center absolute bottom-4 left-0 w-full opacity-0 group-hover:opacity-100 transition-opacity duration-500 transform translate-y-2 group-hover:translate-y-0">Just being silly</p>
+                    </div>
+                </div>
+
+                <!-- Photo 2 -->
+                <div class="w-full sm:w-[45%] md:w-[30%] relative group cursor-pointer" @click="activePhoto = 'gallery2.jpg'; lightboxCaption = 'Being my bhondu'" data-aos="fade-up" data-aos-delay="100">
+                    <div class="absolute -top-4 left-1/2 -translate-x-1/2 w-32 h-8 bg-white/30 backdrop-blur-sm border-l border-r border-white/50 rotate-[1deg] z-20 shadow-sm opacity-80"></div>
+                    <div class="bg-white p-3 pb-16 shadow-xl transform -rotate-1 group-hover:rotate-0 group-hover:scale-105 transition-all duration-500 ease-out relative overflow-hidden rounded-sm">
+                        <img src="gallery2.jpg" class="w-full h-auto object-cover filter sepia-[.2] group-hover:sepia-0 transition duration-500">
+                        <p class="font-handwritten text-3xl text-gray-600 text-center absolute bottom-4 left-0 w-full opacity-0 group-hover:opacity-100 transition-opacity duration-500 transform translate-y-2 group-hover:translate-y-0">Being my bhondu</p>
+                    </div>
+                </div>
+
+                <!-- Photo 3 -->
+                <div class="w-full sm:w-[45%] md:w-[30%] relative group cursor-pointer" @click="activePhoto = 'gallery3.jpg'; lightboxCaption = 'You look beautiful'" data-aos="fade-up" data-aos-delay="200">
+                    <div class="absolute -top-4 left-1/2 -translate-x-1/2 w-32 h-8 bg-white/30 backdrop-blur-sm border-l border-r border-white/50 rotate-[-3deg] z-20 shadow-sm opacity-80"></div>
+                    <div class="bg-white p-3 pb-16 shadow-xl transform rotate-3 group-hover:rotate-0 group-hover:scale-105 transition-all duration-500 ease-out relative overflow-hidden rounded-sm">
+                        <img src="gallery3.jpg" class="w-full h-auto object-cover filter sepia-[.2] group-hover:sepia-0 transition duration-500">
+                        <p class="font-handwritten text-3xl text-gray-600 text-center absolute bottom-4 left-0 w-full opacity-0 group-hover:opacity-100 transition-opacity duration-500 transform translate-y-2 group-hover:translate-y-0">You look beautiful</p>
+                    </div>
+                </div>
+
+                <!-- Photo 4 -->
+                <div class="w-full sm:w-[45%] md:w-[30%] relative group cursor-pointer" @click="activePhoto = 'gallery4.jpg'; lightboxCaption = 'Our first date'" data-aos="fade-up">
+                    <div class="absolute -top-4 left-1/2 -translate-x-1/2 w-32 h-8 bg-white/30 backdrop-blur-sm border-l border-r border-white/50 rotate-[2deg] z-20 shadow-sm opacity-80"></div>
+                    <div class="bg-white p-3 pb-16 shadow-xl transform -rotate-2 group-hover:rotate-0 group-hover:scale-105 transition-all duration-500 ease-out relative overflow-hidden rounded-sm">
+                        <img src="gallery4.jpg" class="w-full h-auto object-cover filter sepia-[.2] group-hover:sepia-0 transition duration-500">
+                        <p class="font-handwritten text-3xl text-gray-600 text-center absolute bottom-4 left-0 w-full opacity-0 group-hover:opacity-100 transition-opacity duration-500 transform translate-y-2 group-hover:translate-y-0">Our first date</p>
+                    </div>
+                </div>
+
+                <!-- Photo 5 -->
+                <div class="w-full sm:w-[45%] md:w-[30%] relative group cursor-pointer" @click="activePhoto = 'gallery5.jpg'; lightboxCaption = 'My forever'" data-aos="fade-up">
+                    <div class="absolute -top-4 left-1/2 -translate-x-1/2 w-32 h-8 bg-white/30 backdrop-blur-sm border-l border-r border-white/50 rotate-[-1deg] z-20 shadow-sm opacity-80"></div>
+                    <div class="bg-white p-3 pb-16 shadow-xl transform rotate-1 group-hover:rotate-0 group-hover:scale-105 transition-all duration-500 ease-out relative overflow-hidden rounded-sm">
+                        <img src="gallery5.jpg" class="w-full h-auto object-cover filter sepia-[.2] group-hover:sepia-0 transition duration-500">
+                        <p class="font-handwritten text-3xl text-gray-600 text-center absolute bottom-4 left-0 w-full opacity-0 group-hover:opacity-100 transition-opacity duration-500 transform translate-y-2 group-hover:translate-y-0">My forever</p>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Lightbox Modal -->
+            <div x-show="activePhoto" 
+                 style="display: none;"
+                 class="fixed inset-0 z-[100] bg-black/90 backdrop-blur-md flex items-center justify-center p-4"
+                 x-transition:enter="transition ease-out duration-300"
+                 x-transition:enter-start="opacity-0"
+                 x-transition:enter-end="opacity-100"
+                 x-transition:leave="transition ease-in duration-200"
+                 x-transition:leave-start="opacity-100"
+                 x-transition:leave-end="opacity-0"
+                 @click.self="activePhoto = null">
+                 
+                 <button @click="activePhoto = null" class="absolute top-6 right-6 text-white hover:text-soft-rose transition transform hover:scale-110">
+                    <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                 </button>
+
+                 <div class="max-w-4xl max-h-screen relative flex flex-col items-center">
+                    <img :src="activePhoto" class="max-w-full max-h-[80vh] rounded-lg shadow-2xl border-4 border-white">
+                    <p class="text-white font-handwritten text-4xl text-center mt-6 tracking-wide" x-text="lightboxCaption"></p>
+                 </div>
+            </div>
+        </section>
+
+        <!-- 2. A Bouquet for You (Interactive Game) -->
+        <section class="py-20 bg-gradient-to-b from-pearl to-champagne/30 overflow-hidden" data-aos="fade-up">
+            <div class="max-w-4xl mx-auto px-4 text-center">
+                <h2 class="font-serif text-4xl text-text-dark mb-4">A Bouquet for You</h2>
+                <p class="text-gray-500 mb-12">Pick the flowers to fill your vase</p>
+
+                <div class="relative h-[400px] flex items-center justify-center">
+                    
+                    <!-- The Vase -->
+                    <div class="relative z-10 transition-all duration-1000" :class="{'scale-110': bouquetCompleted}">
+                        <div class="w-32 h-48 bg-white/40 backdrop-blur-md border border-white rounded-b-[4rem] rounded-t-lg shadow-xl relative overflow-hidden">
+                            <div class="absolute bottom-0 w-full h-1/3 bg-blue-100/30"></div> <!-- Water -->
+                        </div>
+                        <!-- Completed Bouquet Bloom -->
+                        <div x-show="bouquetCompleted" class="absolute bottom-full left-1/2 -translate-x-1/2 w-64 h-64 -mb-8 transition duration-1000" 
+                             x-transition:enter="transition ease-out duration-1000"
+                             x-transition:enter-start="opacity-0 scale-50 translate-y-10"
+                             x-transition:enter-end="opacity-100 scale-100 translate-y-0">
+                            <span class="text-[8rem] leading-none drop-shadow-2xl">💐</span>
+                        </div>
+                    </div>
+
+                    <!-- Flowers to Pick -->
+                    <template x-for="flower in flowers" :key="flower.id">
+                        <button 
+                            @click="pickFlower(flower)"
+                            class="flower-btn absolute text-4xl cursor-pointer hover:scale-125 z-20"
+                            :class="{'collected': flower.collected, 'animate-bounce': !flower.collected}"
+                            :style="`top: ${flower.y}%; left: ${flower.x}%; --tx: ${50 - flower.x}vw; --ty: ${50 - flower.y}vh;`">
+                            <span x-text="flower.icon"></span>
+                        </button>
+                    </template>
+
+                    <!-- Coupon Reveal -->
+                    <div x-show="bouquetCompleted" 
+                         class="absolute inset-0 z-30 flex items-center justify-center bg-black/50 backdrop-blur-sm rounded-xl"
+                         x-transition:enter="transition ease-out duration-500 delay-1000"
+                         x-transition:enter-start="opacity-0"
+                         x-transition:enter-end="opacity-100">
+                        <div class="bg-white p-8 rounded-xl shadow-2xl text-center max-w-sm mx-4 border-2 border-gold-accent">
+                            <h3 class="font-serif text-2xl text-gold-accent mb-2">Coupon Unlocked! 🎟️</h3>
+                            <p class="text-gray-600 mb-4">Good for one <strong>REAL Bouquet</strong> of your choice.</p>
+                            <p class="text-xs text-gray-400">Valid forever. Redeemable with me.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Catch My Love Game -->
+        <section class="py-20 px-4 bg-soft-rose/5" data-aos="fade-up">
+            <div class="max-w-4xl mx-auto text-center">
+                <h2 class="font-serif text-4xl text-text-dark mb-4">Catch My Love</h2>
+                <p class="text-gray-500 mb-8">Catch 10 hearts to win!</p>
+                <div class="relative bg-white rounded-xl shadow-xl overflow-hidden mx-auto max-w-md aspect-[3/4] md:aspect-square border-4 border-soft-rose">
+                    <canvas id="catchGameCanvas" class="w-full h-full block touch-none"></canvas>
+                    
+                    <!-- UI Overlay -->
+                    <div id="gameOverlay" class="absolute inset-0 flex flex-col items-center justify-center bg-black/40 backdrop-blur-sm z-10">
+                        <button id="startGameBtn" class="bg-soft-rose text-white px-8 py-3 rounded-full font-bold text-xl hover:scale-110 transition shadow-lg animate-pulse">Start Game 🐻</button>
+                    </div>
+        
+                    <!-- Score -->
+                    <div class="absolute top-4 left-4 bg-white/80 px-4 py-2 rounded-full font-bold text-soft-rose shadow-sm z-10 pointer-events-none">
+                        Score: <span id="scoreDisplay">0</span>/10
+                    </div>
+        
+                    <!-- Win Message -->
+                    <div id="winMessage" class="absolute inset-0 flex flex-col items-center justify-center bg-soft-rose/95 z-20 hidden text-white p-8 text-center">
+                        <h3 class="font-script text-5xl mb-4">You Won!</h3>
+                        <p class="font-body text-xl mb-8">You caught my heart long ago!<br>(And you're never giving it back!)</p>
+                        <button id="resetGameBtn" class="bg-white text-soft-rose px-6 py-2 rounded-full font-bold hover:bg-champagne transition">Play Again</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Scratch-Off Card Section -->
+        <section class="py-20 px-4 flex flex-col items-center justify-center" data-aos="fade-up">
+            <h2 class="font-serif text-3xl md:text-4xl text-text-dark mb-8 text-center">I have one more secret for you...</h2>
+            
+            <div class="relative w-full max-w-md h-64 rounded-xl overflow-hidden shadow-2xl border-4 border-gold-accent/50 group select-none">
+                <!-- Hidden Message -->
+                <div class="absolute inset-0 bg-white flex items-center justify-center p-8 text-center">
+                    <p class="font-handwritten text-3xl text-soft-rose leading-relaxed">
+                        I’m so sorry for being a jerk lately. You are my favorite person, and I promise to make your birthday as beautiful as you are. Will you forgive me? ❤️
+                    </p>
+                </div>
+                
+                <!-- Scratch Canvas -->
+                <canvas id="scratchCanvas" class="absolute inset-0 w-full h-full cursor-pointer touch-none"></canvas>
+            </div>
+        </section>
+
+        <!-- Interactive Gift Box -->
+        <section class="py-20 flex flex-col items-center justify-center">
+            <p class="mb-8 text-gray-500 font-serif italic">One last surprise...</p>
+            <div class="gift-box relative w-32 h-32 cursor-pointer animate-shake" @click="openGift">
+                <div class="absolute inset-0 bg-soft-rose rounded-lg shadow-2xl"></div>
+                <div class="absolute inset-x-0 top-1/2 h-4 bg-gold-accent -translate-y-1/2"></div>
+                <div class="absolute inset-y-0 left-1/2 w-4 bg-gold-accent -translate-x-1/2"></div>
+                <div class="absolute -top-4 left-1/2 -translate-x-1/2 text-4xl">🎀</div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="py-10 text-center bg-white/50 backdrop-blur-sm">
+            <p class="font-body text-gray-400 text-sm">Made with ❤️ and a lot of apologies.</p>
+        </footer>
+
+        <!-- Full Screen Birthday Overlay -->
+        <div x-show="giftOpened" 
+             style="display: none;"
+             x-transition:enter="transition ease-out duration-1000"
+             x-transition:enter-start="opacity-0 scale-90"
+             x-transition:enter-end="opacity-100 scale-100"
+             class="fixed inset-0 z-[100] bg-black/90 flex flex-col items-center justify-center text-center p-4">
+            <h1 class="font-script text-6xl md:text-8xl text-gold-accent mb-4 animate-bounce">Happy Birthday!</h1>
+            <p class="text-white text-xl font-serif italic">You are my greatest gift.</p>
+            <button @click="giftOpened = false" class="mt-12 px-6 py-2 border border-white/30 text-white rounded-full hover:bg-white/10 transition">Close</button>
+        </div>
+
+    </main>
+
+    <script>
+        // Initialize AOS
+        AOS.init({
+            once: true,
+            offset: 100,
+            duration: 800,
+        });
+
+        // Custom Cursor Logic
+        const cursor = document.getElementById('cursor');
+        document.addEventListener('mousemove', (e) => {
+            cursor.style.left = e.clientX + 'px';
+            cursor.style.top = e.clientY + 'px';
+        });
+        document.addEventListener('mousedown', () => cursor.classList.add('active'));
+        document.addEventListener('mouseup', () => cursor.classList.remove('active'));
+
+        function birthdayApp() {
+            return {
+                envelopeOpen: false,
+                musicPlaying: false,
+                giftOpened: false,
+                bouquetCompleted: false,
+                showTop: false,
+                birthDate: new Date('2004-12-26'), // CHANGE THIS DATE to her actual birthday (YYYY-MM-DD)
+                timeElapsed: { days: 0, hours: 0, minutes: 0, seconds: 0 },
+
+                init() {
+                    const audio = document.getElementById('bgMusic');
+                    audio.play().then(() => {
+                        this.musicPlaying = true;
+                    }).catch(() => {
+                        const startAudio = () => {
+                            if (!this.musicPlaying) {
+                                audio.play();
+                                this.musicPlaying = true;
+                            }
+                            document.removeEventListener('click', startAudio);
+                        };
+                        document.addEventListener('click', startAudio);
+                    });
+                    this.startTimer();
+                },
+                
+                // Flower Game Data
+                flowers: [
+                    { id: 1, icon: '🌹', collected: false, x: 20, y: 20 },
+                    { id: 2, icon: '🌷', collected: false, x: 80, y: 20 },
+                    { id: 3, icon: '🌺', collected: false, x: 20, y: 80 },
+                    { id: 4, icon: '🌸', collected: false, x: 80, y: 80 },
+                    { id: 5, icon: '🌻', collected: false, x: 50, y: 10 },
+                    { id: 6, icon: '🌼', collected: false, x: 50, y: 90 },
+                ],
+                
+                openEnvelope() {
+                    if(this.envelopeOpen) return;
+                    this.envelopeOpen = true;
+                    this.fireConfetti();
+                },
+                
+                toggleMusic() {
+                    const audio = document.getElementById('bgMusic');
+                    if (this.musicPlaying) {
+                        audio.pause();
+                    } else {
+                        audio.play();
+                    }
+                    this.musicPlaying = !this.musicPlaying;
+                },
+
+                pickFlower(flower) {
+                    if(flower.collected) return;
+                    flower.collected = true;
+                    
+                    // Simple ping sound effect using Audio API
+                    const audio = new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-preview.mp3');
+                    audio.volume = 0.2;
+                    audio.play().catch(() => {}); // Ignore auto-play errors
+
+                    if(this.flowers.every(f => f.collected)) {
+                        setTimeout(() => { this.bouquetCompleted = true; this.fireConfetti(); }, 800);
+                    }
+                },
+
+                openGift() {
+                    this.giftOpened = true;
+                    this.fireFireworks();
+                },
+
+                fireConfetti() {
+                    confetti({
+                        particleCount: 100,
+                        spread: 70,
+                        origin: { y: 0.6 },
+                        colors: ['#E6A4B4', '#C5A059', '#FDFCF5']
+                    });
+                },
+
+                fireFireworks() {
+                    var duration = 5 * 1000;
+                    var animationEnd = Date.now() + duration;
+                    var defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 200 };
+
+                    var interval = setInterval(function() {
+                        var timeLeft = animationEnd - Date.now();
+
+                        if (timeLeft <= 0) {
+                            return clearInterval(interval);
+                        }
+
+                        var particleCount = 50 * (timeLeft / duration);
+                        confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } }));
+                        confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } }));
+                    }, 250);
+                },
+
+                startTimer() {
+                    setInterval(() => {
+                        const now = new Date();
+                        const diff = now - this.birthDate;
+                        
+                        this.timeElapsed.days = Math.floor(diff / (1000 * 60 * 60 * 24));
+                        this.timeElapsed.hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+                        this.timeElapsed.minutes = Math.floor((diff / 1000 / 60) % 60);
+                        this.timeElapsed.seconds = Math.floor((diff / 1000) % 60);
+                    }, 1000);
+                }
+            }
+        }
+
+        function randomInRange(min, max) {
+            return Math.random() * (max - min) + min;
+        }
+
+        // Scratch Card Logic
+        document.addEventListener('DOMContentLoaded', () => {
+            const canvas = document.getElementById('scratchCanvas');
+            const ctx = canvas.getContext('2d');
+            const container = canvas.parentElement;
+            
+            // Handle resizing
+            const initCanvas = () => {
+                canvas.width = container.offsetWidth;
+                canvas.height = container.offsetHeight;
+                
+                // Fill with Gold Gradient
+                const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+                gradient.addColorStop(0, '#D4AF37');
+                gradient.addColorStop(0.3, '#F7E7CE');
+                gradient.addColorStop(0.6, '#D4AF37');
+                gradient.addColorStop(1, '#C5A059');
+                ctx.fillStyle = gradient;
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                // Add Glitter Effect
+                for(let i=0; i<300; i++) {
+                    ctx.fillStyle = Math.random() > 0.5 ? '#FFFFFF' : '#FFD700';
+                    ctx.beginPath();
+                    ctx.arc(Math.random() * canvas.width, Math.random() * canvas.height, Math.random() * 2, 0, Math.PI*2);
+                    ctx.fill();
+                }
+
+                // Overlay Text
+                ctx.font = 'bold 20px "Quicksand"';
+                ctx.fillStyle = '#5c4033';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText('✨ Scratch here to reveal a secret... ✨', canvas.width/2, canvas.height/2);
+            };
+
+            // Initialize
+            initCanvas();
+
+            let isDrawing = false;
+            let revealed = false;
+            
+            // Scratch Sound
+            const scratchSound = new Audio('https://assets.mixkit.co/active_storage/sfx/2571/2571-preview.mp3');
+            scratchSound.loop = true;
+            scratchSound.volume = 0.3;
+
+            const getPos = (e) => {
+                const rect = canvas.getBoundingClientRect();
+                const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+                const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+                return { x: clientX - rect.left, y: clientY - rect.top };
+            };
+
+            const scratch = (e) => {
+                if (!isDrawing || revealed) return;
+                
+                // Haptic Feedback
+                if (navigator.vibrate) navigator.vibrate(5);
+
+                const { x, y } = getPos(e);
+                ctx.globalCompositeOperation = 'destination-out';
+                ctx.beginPath();
+                ctx.arc(x, y, 25, 0, Math.PI * 2);
+                ctx.fill();
+            };
+
+            const checkReveal = () => {
+                if (revealed) return;
+                const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                let transparent = 0;
+                for (let i = 3; i < imageData.data.length; i += 16) { // Check every 4th pixel for speed
+                    if (imageData.data[i] === 0) transparent++;
+                }
+                if (transparent / (imageData.data.length / 16) > 0.6) {
+                    revealed = true;
+                    scratchSound.pause();
+                    canvas.style.transition = 'opacity 0.5s';
+                    canvas.style.opacity = '0';
+                    setTimeout(() => canvas.remove(), 500);
+                    confetti({ particleCount: 150, spread: 100, origin: { y: 0.7 } });
+                }
+            };
+
+            ['mousedown', 'touchstart'].forEach(e => canvas.addEventListener(e, (ev) => { 
+                isDrawing = true; 
+                scratchSound.play().catch(()=>{}); 
+                scratch(ev); 
+            }));
+            ['mousemove', 'touchmove'].forEach(e => canvas.addEventListener(e, (ev) => { ev.preventDefault(); scratch(ev); }));
+            ['mouseup', 'touchend'].forEach(e => { canvas.addEventListener(e, () => { 
+                isDrawing = false; 
+                scratchSound.pause(); 
+                checkReveal(); 
+            }); });
+            canvas.addEventListener('mouseleave', () => { 
+                if(isDrawing) { isDrawing = false; scratchSound.pause(); } 
+            });
+        });
+
+        // Catch My Love Game Logic
+        document.addEventListener('DOMContentLoaded', () => {
+            const canvas = document.getElementById('catchGameCanvas');
+            if(!canvas) return;
+            
+            const ctx = canvas.getContext('2d');
+            const overlay = document.getElementById('gameOverlay');
+            const winMsg = document.getElementById('winMessage');
+            const scoreDisplay = document.getElementById('scoreDisplay');
+            const startBtn = document.getElementById('startGameBtn');
+            const resetBtn = document.getElementById('resetGameBtn');
+
+            let score = 0;
+            let gameRunning = false;
+            let animationId;
+            let player = { x: 0, y: 0, width: 60, height: 60, icon: '🐻' };
+            let fallingObjects = [];
+            let lastTime = 0;
+            let spawnTimer = 0;
+
+            function resize() {
+                const rect = canvas.parentElement.getBoundingClientRect();
+                canvas.width = rect.width;
+                canvas.height = rect.height;
+                player.y = canvas.height - 60;
+            }
+            window.addEventListener('resize', resize);
+            
+            // Input handling
+            let inputX = 0;
+            
+            function updateInput(e) {
+                const rect = canvas.getBoundingClientRect();
+                const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+                inputX = clientX - rect.left;
+                // Clamp
+                inputX = Math.max(player.width/2, Math.min(canvas.width - player.width/2, inputX));
+            }
+
+            ['mousemove', 'touchmove'].forEach(evt => 
+                canvas.addEventListener(evt, (e) => {
+                    if(gameRunning) {
+                        e.preventDefault();
+                        updateInput(e);
+                    }
+                }, {passive: false})
+            );
+
+            function spawnObject() {
+                const type = Math.random() > 0.2 ? 'heart' : 'sad'; 
+                fallingObjects.push({
+                    x: Math.random() * (canvas.width - 40) + 20,
+                    y: -40,
+                    speed: Math.random() * 3 + 2,
+                    type: type,
+                    icon: type === 'heart' ? '❤️' : '😢',
+                    size: 30
+                });
+            }
+
+            function update(timestamp) {
+                if (!gameRunning) return;
+                
+                const deltaTime = timestamp - lastTime;
+                lastTime = timestamp;
+
+                player.x += (inputX - player.x) * 0.2; 
+
+                spawnTimer += deltaTime;
+                if (spawnTimer > 800) { 
+                    spawnObject();
+                    spawnTimer = 0;
+                }
+
+                for (let i = fallingObjects.length - 1; i >= 0; i--) {
+                    let obj = fallingObjects[i];
+                    obj.y += obj.speed;
+
+                    const dx = obj.x - player.x;
+                    const dy = obj.y - player.y;
+                    const distance = Math.sqrt(dx*dx + dy*dy);
+
+                    if (distance < (player.width/2 + obj.size/2)) {
+                        if (obj.type === 'heart') {
+                            score++;
+                            scoreDisplay.textContent = score;
+                            if (score >= 10) {
+                                gameOver(true);
+                                return;
+                            }
+                        } else {
+                            player.icon = '💫';
+                            setTimeout(() => player.icon = '🐻', 500);
+                        }
+                        fallingObjects.splice(i, 1);
+                        continue;
+                    }
+
+                    if (obj.y > canvas.height) fallingObjects.splice(i, 1);
+                }
+
+                draw();
+                animationId = requestAnimationFrame(update);
+            }
+
+            function draw() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.font = '50px Arial';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(player.icon, player.x, player.y);
+                ctx.font = '30px Arial';
+                fallingObjects.forEach(obj => ctx.fillText(obj.icon, obj.x, obj.y));
+            }
+
+            function startGame() {
+                resize();
+                score = 0;
+                scoreDisplay.textContent = '0';
+                fallingObjects = [];
+                gameRunning = true;
+                overlay.classList.add('hidden');
+                winMsg.classList.add('hidden');
+                lastTime = performance.now();
+                inputX = canvas.width / 2;
+                player.x = inputX;
+                animationId = requestAnimationFrame(update);
+            }
+
+            function gameOver(win) {
+                gameRunning = false;
+                cancelAnimationFrame(animationId);
+                if (win) {
+                    winMsg.classList.remove('hidden');
+                    confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 }, colors: ['#E6A4B4', '#C5A059', '#FDFCF5'] });
+                }
+            }
+
+            startBtn.addEventListener('click', startGame);
+            resetBtn.addEventListener('click', startGame);
+        });
+    </script>
+</body>
+</html>
