@@ -181,7 +181,7 @@
         <button @click="toggleMusic" class="glass-panel w-12 h-12 rounded-full flex items-center justify-center text-soft-rose hover:scale-110 transition duration-300">
             <span x-text="musicPlaying ? '⏸' : '🎵'"></span>
         </button>
-        <audio id="bgMusic" loop>
+        <audio id="bgMusic" loop autoplay>
             <source src="music.mp3" type="audio/mpeg">
         </audio>
     </div>
@@ -580,9 +580,9 @@
                                 audio.play();
                                 this.musicPlaying = true;
                             }
-                            document.removeEventListener('click', startAudio);
+                            ['click', 'touchstart', 'keydown'].forEach(e => document.removeEventListener(e, startAudio));
                         };
-                        document.addEventListener('click', startAudio);
+                        ['click', 'touchstart', 'keydown'].forEach(e => document.addEventListener(e, startAudio));
                     });
                     this.startTimer();
                 },
