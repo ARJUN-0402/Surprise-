@@ -46,6 +46,7 @@
                         'marquee': 'marquee 25s linear infinite',
                         'shake': 'shake 0.82s cubic-bezier(.36,.07,.19,.97) both infinite',
                         'ping': 'ping 1s cubic-bezier(0, 0, 0.2, 1) infinite',
+                        'gradient-shift': 'gradient-shift 15s ease infinite',
                     },
                     keyframes: {
                         float: {
@@ -61,6 +62,10 @@
                             '20%, 80%': { transform: 'translate3d(2px, 0, 0)' },
                             '30%, 50%, 70%': { transform: 'translate3d(-4px, 0, 0)' },
                             '40%, 60%': { transform: 'translate3d(4px, 0, 0)' }
+                        },
+                        'gradient-shift': {
+                            '0%, 100%': { 'background-position': '0% 50%' },
+                            '50%': { 'background-position': '100% 50%' },
                         }
                     }
                 }
@@ -157,10 +162,8 @@
         }
 
         /* Flower Animation */
-        .flower-btn { transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1); }
-        .flower-btn.collected {
-            transform: translate(var(--tx), var(--ty)) scale(0.5) rotate(360deg);
-            opacity: 0;
+        .flower-btn { 
+            transition: all 1s cubic-bezier(0.34, 1.56, 0.64, 1); 
         }
         
         /* Floating Bubbles */
@@ -168,6 +171,93 @@
         @keyframes floatBubble {
             0%, 100% { transform: translateY(0); }
             50% { transform: translateY(-10px); }
+        }
+
+        /* Click Heart Animation */
+        .click-heart {
+            position: absolute;
+            pointer-events: none;
+            animation: floatUpFade 1s ease-out forwards;
+            font-size: 1.5rem;
+            z-index: 9999;
+        }
+        @keyframes floatUpFade {
+            0% { transform: translateY(0) scale(1); opacity: 1; }
+            100% { transform: translateY(-50px) scale(1.5); opacity: 0; }
+        }
+
+        /* Love Toast Notification */
+        .toast-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            pointer-events: none;
+        }
+        .love-toast {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(5px);
+            border-left: 4px solid #E6A4B4;
+            padding: 12px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            transform: translateX(120%);
+            transition: transform 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+            font-family: 'Quicksand', sans-serif;
+            color: #4A4A4A;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 600;
+        }
+        .love-toast.show {
+            transform: translateX(0);
+        }
+
+        /* Cloud Drift Animation */
+        @keyframes drift {
+            from { transform: translateX(-10vw); }
+            to { transform: translateX(110vw); }
+        }
+        .animate-drift {
+            animation: drift linear infinite;
+        }
+
+        /* Balloon Float Animation */
+        @keyframes floatUp {
+            0% { transform: translateY(100vh) rotate(0deg); opacity: 0.6; }
+            100% { transform: translateY(-20vh) rotate(20deg); opacity: 0; }
+        }
+        .animate-float-up {
+            animation: floatUp linear infinite;
+        }
+        
+        /* Candle Flame Animation */
+        .flame {
+            animation: flicker 0.5s infinite alternate;
+            transform-origin: center bottom;
+        }
+        @keyframes flicker {
+            0% { transform: scale(1); opacity: 1; }
+            100% { transform: scale(0.9) rotate(2deg); opacity: 0.9; }
+        }
+        .flame.out {
+            animation: puff 0.3s forwards;
+        }
+        @keyframes puff {
+            to { transform: scale(0); opacity: 0; }
+        }
+
+        /* Bottle Float Animation */
+        @keyframes floatBottle {
+            0%, 100% { transform: translateY(0) rotate(-10deg); }
+            50% { transform: translateY(-15px) rotate(5deg); }
+        }
+        .animate-float-bottle {
+            animation: floatBottle 3s ease-in-out infinite;
         }
     </style>
 </head>
@@ -196,9 +286,19 @@
 
     <!-- Background Gradients -->
     <div class="fixed inset-0 -z-10">
-        <div class="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-champagne via-pearl to-soft-rose opacity-50"></div>
+        <div class="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-champagne via-soft-rose to-pearl bg-[length:400%_400%] animate-gradient-shift opacity-50"></div>
         <div class="absolute top-[-10%] right-[-10%] w-96 h-96 bg-soft-rose rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-float"></div>
         <div class="absolute bottom-[-10%] left-[-10%] w-96 h-96 bg-gold-accent rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-float" style="animation-delay: 2s"></div>
+        
+        <!-- Floating Clouds -->
+        <div class="absolute top-20 left-0 text-6xl opacity-30 animate-drift" style="animation-duration: 45s;">☁️</div>
+        <div class="absolute top-60 left-0 text-8xl opacity-20 animate-drift" style="animation-duration: 60s; animation-delay: -20s;">☁️</div>
+        <div class="absolute top-32 left-0 text-4xl opacity-30 animate-drift" style="animation-duration: 35s; animation-delay: -10s;">☁️</div>
+
+        <!-- Floating Balloons -->
+        <div class="absolute -bottom-32 left-[15%] text-6xl opacity-60 animate-float-up" style="animation-duration: 20s;">🎈</div>
+        <div class="absolute -bottom-32 left-[75%] text-5xl opacity-50 animate-float-up" style="animation-duration: 25s; animation-delay: 5s;">🎈</div>
+        <div class="absolute -bottom-32 left-[45%] text-7xl opacity-40 animate-float-up" style="animation-duration: 18s; animation-delay: 10s;">🎈</div>
     </div>
 
     <main class="relative">
@@ -212,6 +312,7 @@
                 <img src="kannu.jpg" 
                      alt="Birthday Girl" 
                      class="relative w-full h-full object-cover rounded-full border-4 border-white/80 shadow-2xl transform transition duration-500 hover:scale-105">
+                <div class="absolute -top-4 -right-4 text-5xl animate-bounce drop-shadow-md" style="animation-duration: 2s;">👑</div>
             </div>
 
             <h1 class="font-serif italic text-5xl md:text-7xl text-text-dark mb-4" data-aos="fade-up" data-aos-delay="200">
@@ -288,6 +389,70 @@
                 <div class="glass-panel p-4 rounded-xl w-24 md:w-32 flex flex-col items-center">
                     <span class="text-2xl md:text-4xl font-bold text-soft-rose" x-text="timeElapsed.seconds">0</span>
                     <span class="text-xs uppercase tracking-widest text-gray-500 mt-1">Seconds</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Countdown Timer Section -->
+        <section class="py-12 px-4" data-aos="fade-up" x-data="{
+            targetDate: new Date().getTime() + (1000 * 60 * 60 * 24), // Default: 24 hours from now. Replace with specific date: new Date('2024-12-31T00:00:00').getTime()
+            timeLeft: { days: 0, hours: 0, minutes: 0, seconds: 0 },
+            expired: false,
+            init() {
+                this.updateTimer();
+                setInterval(() => this.updateTimer(), 1000);
+            },
+            updateTimer() {
+                const now = new Date().getTime();
+                const distance = this.targetDate - now;
+                
+                if (distance < 0) {
+                    this.expired = true;
+                    this.timeLeft = { days: 0, hours: 0, minutes: 0, seconds: 0 };
+                } else {
+                    this.timeLeft.days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                    this.timeLeft.hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                    this.timeLeft.minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                    this.timeLeft.seconds = Math.floor((distance % (1000 * 60)) / 1000);
+                }
+            }
+        }">
+            <div class="max-w-4xl mx-auto text-center">
+                <h2 class="font-serif text-3xl md:text-4xl text-text-dark mb-8">Countdown to the Next Surprise ✨</h2>
+                
+                <!-- Timer Display -->
+                <div x-show="!expired" class="flex flex-wrap justify-center gap-4 md:gap-8 mb-8">
+                    <div class="glass-panel p-4 rounded-xl w-20 md:w-24 flex flex-col items-center">
+                        <span class="text-2xl md:text-3xl font-bold text-soft-rose" x-text="timeLeft.days"></span>
+                        <span class="text-[10px] uppercase tracking-widest text-gray-500 mt-1">Days</span>
+                    </div>
+                    <div class="glass-panel p-4 rounded-xl w-20 md:w-24 flex flex-col items-center">
+                        <span class="text-2xl md:text-3xl font-bold text-soft-rose" x-text="timeLeft.hours"></span>
+                        <span class="text-[10px] uppercase tracking-widest text-gray-500 mt-1">Hours</span>
+                    </div>
+                    <div class="glass-panel p-4 rounded-xl w-20 md:w-24 flex flex-col items-center">
+                        <span class="text-2xl md:text-3xl font-bold text-soft-rose" x-text="timeLeft.minutes"></span>
+                        <span class="text-[10px] uppercase tracking-widest text-gray-500 mt-1">Mins</span>
+                    </div>
+                    <div class="glass-panel p-4 rounded-xl w-20 md:w-24 flex flex-col items-center">
+                        <span class="text-2xl md:text-3xl font-bold text-soft-rose" x-text="timeLeft.seconds"></span>
+                        <span class="text-[10px] uppercase tracking-widest text-gray-500 mt-1">Secs</span>
+                    </div>
+                </div>
+
+                <!-- Revealed Message -->
+                <div x-show="expired" 
+                     style="display: none;"
+                     x-transition:enter="transition ease-out duration-1000"
+                     x-transition:enter-start="opacity-0 transform scale-90"
+                     x-transition:enter-end="opacity-100 transform scale-100"
+                     class="glass-panel p-8 rounded-2xl border-2 border-gold-accent/30 bg-white/60 max-w-2xl mx-auto">
+                    <h3 class="font-script text-4xl text-soft-rose mb-4">It's Time! 🎁</h3>
+                    <p class="text-lg text-gray-700 mb-6">
+                        Pack your bags, because we are going on a surprise trip this weekend! 
+                        <br><span class="text-sm text-gray-500">(Check your email for tickets!)</span>
+                    </p>
+                    <div class="text-6xl animate-bounce">✈️</div>
                 </div>
             </div>
         </section>
@@ -422,48 +587,38 @@
         <!-- 2. A Bouquet for You (Interactive Game) -->
         <section class="py-20 bg-gradient-to-b from-pearl to-champagne/30 overflow-hidden" data-aos="fade-up">
             <div class="max-w-4xl mx-auto px-4 text-center">
-                <h2 class="font-serif text-4xl text-text-dark mb-4">A Bouquet for You</h2>
-                <p class="text-gray-500 mb-12">Pick the flowers to fill your vase</p>
+                <h2 class="font-serif text-4xl text-text-dark mb-4">Build Your Bouquet 💐</h2>
+                <p class="text-gray-500 mb-12">Tap the flowers to arrange them in the vase</p>
 
                 <div class="relative h-[400px] flex items-center justify-center">
                     
-                    <!-- The Vase -->
-                    <div class="relative z-10 transition-all duration-1000" :class="{'scale-110': bouquetCompleted}">
-                        <div class="w-32 h-48 bg-white/40 backdrop-blur-md border border-white rounded-b-[4rem] rounded-t-lg shadow-xl relative overflow-hidden">
-                            <div class="absolute bottom-0 w-full h-1/3 bg-blue-100/30"></div> <!-- Water -->
-                        </div>
-                        <!-- Completed Bouquet Bloom -->
-                        <div x-show="bouquetCompleted" class="absolute bottom-full left-1/2 -translate-x-1/2 w-64 h-64 -mb-8 transition duration-1000" 
-                             x-transition:enter="transition ease-out duration-1000"
-                             x-transition:enter-start="opacity-0 scale-50 translate-y-10"
-                             x-transition:enter-end="opacity-100 scale-100 translate-y-0">
-                            <span class="text-[8rem] leading-none drop-shadow-2xl">💐</span>
-                        </div>
+                    <!-- Vase Back (Glass) -->
+                    <div class="absolute bottom-16 w-48 h-64 bg-white/10 backdrop-blur-md border border-white/30 rounded-b-[4rem] rounded-t-xl z-10 shadow-2xl overflow-hidden">
+                        <div class="absolute bottom-0 w-full h-2/3 bg-gradient-to-t from-blue-200/30 to-transparent"></div>
                     </div>
 
-                    <!-- Flowers to Pick -->
+                    <!-- Flowers -->
                     <template x-for="flower in flowers" :key="flower.id">
                         <button 
                             @click="pickFlower(flower)"
-                            class="flower-btn absolute text-4xl cursor-pointer hover:scale-125 z-20"
-                            :class="{'collected': flower.collected, 'animate-bounce': !flower.collected}"
-                            :style="`top: ${flower.y}%; left: ${flower.x}%; --tx: ${50 - flower.x}vw; --ty: ${50 - flower.y}vh;`">
-                            <span x-text="flower.icon"></span>
+                            class="flower-btn absolute flex flex-col items-center justify-center transition-all duration-1000 ease-out"
+                            :class="flower.collected ? 'z-20 cursor-default' : 'z-40 animate-float'"
+                            :style="`
+                                top: ${flower.collected ? flower.endY : flower.startY}%; 
+                                left: ${flower.collected ? flower.endX : flower.startX}%; 
+                                transform: translate(-50%, -50%) rotate(${flower.collected ? flower.rotate : 0}deg) scale(${flower.collected ? 1 : 1.1});
+                            `">
+                            <span class="text-5xl filter drop-shadow-lg relative z-10" x-text="flower.icon"></span>
+                            <div class="w-1.5 h-40 bg-gradient-to-b from-green-400 to-green-800 absolute top-8 -z-10 origin-top transition-opacity duration-500 rounded-full"
+                                 :class="flower.collected ? 'opacity-100' : 'opacity-0'"></div>
                         </button>
                     </template>
 
-                    <!-- Coupon Reveal -->
-                    <div x-show="bouquetCompleted" 
-                         class="absolute inset-0 z-30 flex items-center justify-center bg-black/50 backdrop-blur-sm rounded-xl"
-                         x-transition:enter="transition ease-out duration-500 delay-1000"
-                         x-transition:enter-start="opacity-0"
-                         x-transition:enter-end="opacity-100">
-                        <div class="bg-white p-8 rounded-xl shadow-2xl text-center max-w-sm mx-4 border-2 border-gold-accent">
-                            <h3 class="font-serif text-2xl text-gold-accent mb-2">Coupon Unlocked! 🎟️</h3>
-                            <p class="text-gray-600 mb-4">Good for one <strong>REAL Bouquet</strong> of your choice.</p>
-                            <p class="text-xs text-gray-400">Valid forever. Redeemable with me.</p>
-                        </div>
+                    <!-- Vase Front (Reflection/Water) -->
+                    <div class="absolute bottom-16 w-48 h-64 rounded-b-[4rem] rounded-t-xl z-30 pointer-events-none border-t-4 border-white/20 shadow-[inset_0_0_20px_rgba(255,255,255,0.2)]">
+                        <div class="absolute top-4 right-6 w-4 h-32 bg-gradient-to-b from-white/40 to-transparent rounded-full blur-[2px] rotate-6"></div>
                     </div>
+
                 </div>
             </div>
         </section>
@@ -478,7 +633,7 @@
                     
                     <!-- UI Overlay -->
                     <div id="gameOverlay" class="absolute inset-0 flex flex-col items-center justify-center bg-black/40 backdrop-blur-sm z-10">
-                        <button id="startGameBtn" class="bg-soft-rose text-white px-8 py-3 rounded-full font-bold text-xl hover:scale-110 transition shadow-lg animate-pulse">Start Game 🐻</button>
+                        <button id="startGameBtn" class="bg-soft-rose text-white px-8 py-3 rounded-full font-bold text-xl hover:scale-110 transition shadow-lg animate-pulse">Start Game 🐻‍❄️</button>
                     </div>
         
                     <!-- Score -->
@@ -496,6 +651,88 @@
             </div>
         </section>
 
+        <!-- Reasons Why I Love You -->
+        <section class="py-20 px-4 bg-white/40 backdrop-blur-sm" data-aos="fade-up">
+            <div class="max-w-3xl mx-auto text-center" x-data="{
+                reasons: [
+                    'The way you light up every room you walk into.',
+                    'Your laugh is my favorite sound in the world.',
+                    'How you support me in everything I do.',
+                    'Your incredible kindness and big heart.',
+                    'The way you look at me.',
+                    'You make even the boring days feel special.',
+                    'Your intelligence and wit amaze me.',
+                    'Because you are my best friend.',
+                    'The way you scrunch your nose when you\'re happy.',
+                    'I love you more with every passing day.'
+                ],
+                currentReason: 'Click the button to find out why! 💖',
+                show: true,
+                generateReason() {
+                    this.show = false;
+                    setTimeout(() => {
+                        let newReason;
+                        do {
+                            newReason = this.reasons[Math.floor(Math.random() * this.reasons.length)];
+                        } while(newReason === this.currentReason && this.reasons.length > 1);
+                        this.currentReason = newReason;
+                        this.show = true;
+                    }, 300);
+                }
+            }">
+                <h2 class="font-serif text-4xl text-text-dark mb-8">Reasons Why I Love You</h2>
+                
+                <div class="min-h-[150px] flex items-center justify-center mb-8 p-8 glass-panel rounded-2xl relative overflow-hidden">
+                    <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-soft-rose to-transparent opacity-50"></div>
+                    <p class="font-handwritten text-3xl md:text-4xl text-soft-rose transition-all duration-500 transform" 
+                       :class="show ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'"
+                       x-text="currentReason"></p>
+                    <div class="absolute bottom-2 right-4 text-6xl opacity-10 pointer-events-none">❤️</div>
+                </div>
+
+                <button @click="generateReason()" class="bg-gold-accent text-white px-8 py-3 rounded-full font-bold shadow-lg hover:bg-soft-rose hover:scale-105 transition duration-300 flex items-center justify-center mx-auto gap-2">
+                    <span>Tell Me Another Reason</span>
+                    <span class="animate-pulse">💝</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- Make a Wish Cake Section -->
+        <section class="py-24 px-4 text-center bg-white/30 backdrop-blur-sm" data-aos="fade-up" x-data="{ 
+            candles: [true, true, true], 
+            wished: false,
+            blowCandle(index) {
+                if(!this.candles[index]) return;
+                this.candles[index] = false;
+                if(this.candles.every(c => !c)) {
+                    setTimeout(() => {
+                        this.wished = true;
+                        confetti({ particleCount: 150, spread: 100, origin: { y: 0.6 }, colors: ['#E6A4B4', '#C5A059', '#FDFCF5'] });
+                    }, 500);
+                }
+            }
+        }">
+            <h2 class="font-serif text-4xl text-text-dark mb-4">Make a Wish 🎂</h2>
+            <p class="text-gray-500 mb-12" x-show="!wished">Tap the candles to blow them out!</p>
+            <p class="text-soft-rose text-xl font-handwritten mb-12 animate-bounce" x-show="wished" style="display: none;">May all your dreams come true! ✨</p>
+
+            <div class="relative inline-block mt-10">
+                <div class="w-64 h-32 bg-soft-rose rounded-lg relative flex justify-center items-end shadow-xl border-b-8 border-black/5">
+                    <div class="absolute top-0 w-full h-4 bg-white/30 skew-y-0 rounded-full"></div>
+                    <div class="absolute -top-8 w-full flex justify-center gap-8">
+                        <template x-for="(isLit, index) in candles">
+                            <div class="relative w-4 h-12 bg-white border border-gray-200 cursor-pointer hover:scale-110 transition origin-bottom" @click="blowCandle(index)">
+                                <div class="absolute bottom-0 w-full h-2 bg-red-300"></div>
+                                <div class="absolute -top-6 left-1/2 -translate-x-1/2 w-4 h-6 bg-orange-400 rounded-full blur-[1px] flame" :class="!isLit ? 'out' : ''"><div class="absolute top-1 left-1 w-2 h-3 bg-yellow-200 rounded-full"></div></div>
+                            </div>
+                        </template>
+                    </div>
+                    <div class="text-white font-script text-3xl mb-8">Happy Bday</div>
+                </div>
+                <div class="absolute -bottom-2 left-1/2 -translate-x-1/2 w-72 h-4 bg-gray-200 rounded-full shadow-lg -z-10"></div>
+            </div>
+        </section>
+
         <!-- Scratch-Off Card Section -->
         <section class="py-20 px-4 flex flex-col items-center justify-center" data-aos="fade-up">
             <h2 class="font-serif text-3xl md:text-4xl text-text-dark mb-8 text-center">I have one more secret for you...</h2>
@@ -510,6 +747,159 @@
                 
                 <!-- Scratch Canvas -->
                 <canvas id="scratchCanvas" class="absolute inset-0 w-full h-full cursor-pointer touch-none"></canvas>
+            </div>
+        </section>
+
+        <!-- Fortune Cookie Section -->
+        <section class="py-24 px-4 text-center" data-aos="fade-up" x-data="{
+            opened: false,
+            fortune: '',
+            fortunes: [
+                'A lifetime of happiness awaits you! 🌟',
+                'You will be spoiled with love today and always. 💖',
+                'Adventure is calling our names! ✈️',
+                'Your smile will save the world today. 😊',
+                'We are destined for greatness together. 🚀',
+                'Something sweet is coming your way... 🍰'
+            ],
+            crackCookie() {
+                if(this.opened) return;
+                this.fortune = this.fortunes[Math.floor(Math.random() * this.fortunes.length)];
+                this.opened = true;
+                confetti({ particleCount: 50, spread: 60, origin: { y: 0.7 }, colors: ['#F7E7CE', '#C5A059'] });
+            }
+        }">
+            <h2 class="font-serif text-4xl text-text-dark mb-12">Your Birthday Fortune 🥠</h2>
+            
+            <div class="relative h-64 flex justify-center items-center">
+                <!-- Closed Cookie -->
+                <button @click="crackCookie()" 
+                        x-show="!opened" 
+                        x-transition:leave="transition ease-in duration-300"
+                        x-transition:leave-start="opacity-100 scale-100"
+                        x-transition:leave-end="opacity-0 scale-110"
+                        class="text-[8rem] hover:scale-110 transition duration-300 animate-float cursor-pointer filter drop-shadow-xl">
+                    🥠
+                </button>
+                
+                <!-- Opened Message -->
+                <div x-show="opened" 
+                     style="display: none;"
+                     x-transition:enter="transition ease-out duration-500 delay-300"
+                     x-transition:enter-start="opacity-0 translate-y-10 scale-50"
+                     x-transition:enter-end="opacity-100 translate-y-0 scale-100"
+                     class="bg-white border-2 border-gold-accent p-6 shadow-xl max-w-sm transform rotate-1 relative">
+                    <div class="absolute -top-3 left-1/2 -translate-x-1/2 w-4 h-4 bg-gray-200 rounded-full shadow-inner"></div>
+                    <p class="font-handwritten text-2xl text-text-dark leading-relaxed" x-text="fortune"></p>
+                    <div class="mt-4 pt-4 border-t border-dashed border-gray-200 flex justify-between text-xs text-gray-400 font-mono">
+                        <span>Lucky No: 12, 26, 04</span>
+                        <span>❤️</span>
+                    </div>
+                </div>
+            </div>
+            <p x-show="!opened" class="text-gray-400 text-sm animate-pulse mt-4">Tap to crack open</p>
+        </section>
+
+        <!-- My Promises Checklist -->
+        <section class="py-20 px-4 bg-soft-rose/5" data-aos="fade-up" x-data="{
+            promises: [
+                { text: 'To always listen to your rants', checked: false },
+                { text: 'To bring you food when you are hangry', checked: false },
+                { text: 'To never stop trying to make you smile', checked: false },
+                { text: 'To love you even when you steal the blanket', checked: false },
+                { text: 'To be your biggest fan, always', checked: false }
+            ],
+            get allChecked() { return this.promises.every(p => p.checked); }
+        }">
+            <div class="max-w-2xl mx-auto bg-white p-8 md:p-12 rounded-2xl shadow-2xl relative overflow-hidden border border-gray-100">
+                <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-soft-rose via-gold-accent to-soft-rose"></div>
+                
+                <h2 class="font-serif text-3xl text-center mb-8 text-text-dark">My Promises to You 🤞</h2>
+                
+                <div class="space-y-4 relative z-10">
+                    <template x-for="(promise, index) in promises" :key="index">
+                        <label class="flex items-center gap-4 cursor-pointer group p-3 hover:bg-soft-rose/5 rounded-xl transition duration-300 border border-transparent hover:border-soft-rose/20">
+                            <div class="relative flex-shrink-0">
+                                <input type="checkbox" x-model="promise.checked" class="peer sr-only">
+                                <div class="w-6 h-6 border-2 border-soft-rose rounded-md flex items-center justify-center peer-checked:bg-soft-rose peer-checked:border-soft-rose transition duration-300 shadow-sm">
+                                    <svg class="w-4 h-4 text-white opacity-0 peer-checked:opacity-100 transition-opacity duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path></svg>
+                                </div>
+                            </div>
+                            <span class="font-body text-lg text-gray-700 group-hover:text-soft-rose transition duration-300 select-none" :class="promise.checked ? 'line-through text-gray-400' : ''" x-text="promise.text"></span>
+                        </label>
+                    </template>
+                </div>
+
+                <!-- Stamp Animation -->
+                <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 border-[6px] border-soft-rose text-soft-rose font-bold text-4xl md:text-6xl p-6 rounded-lg opacity-0 rotate-[-20deg] transition-all duration-700 pointer-events-none z-20 mix-blend-multiply"
+                     :class="allChecked ? 'opacity-80 scale-100' : 'opacity-0 scale-150'">
+                    SEALED<br>WITH LOVE 💋
+                </div>
+            </div>
+        </section>
+
+        <!-- Virtual Hug Section -->
+        <section class="py-16 px-4 text-center" data-aos="fade-up" x-data="{ 
+            hugging: false, 
+            showHeart: false,
+            giveHug() {
+                if(this.hugging) return;
+                this.hugging = true;
+                setTimeout(() => this.showHeart = true, 500);
+                setTimeout(() => {
+                    this.hugging = false;
+                    this.showHeart = false;
+                    confetti({ particleCount: 30, spread: 50, origin: { y: 0.8 }, colors: ['#E6A4B4'] });
+                }, 2000);
+            }
+        }">
+            <h2 class="font-serif text-3xl text-text-dark mb-8">Sending You a Big Hug 🫂</h2>
+            
+            <div class="relative h-40 flex items-center justify-center cursor-pointer select-none" @click="giveHug()">
+                <div class="text-7xl md:text-8xl transition-transform duration-700 transform origin-bottom-right z-10"
+                     :class="hugging ? 'translate-x-6 rotate-12' : '-translate-x-8'">🐻‍❄️</div>
+                
+                <div class="absolute text-6xl transition-all duration-500 transform z-20"
+                     :class="showHeart ? 'opacity-100 scale-125 -translate-y-16' : 'opacity-0 scale-0 translate-y-0'">💖</div>
+
+                <div class="text-7xl md:text-8xl transition-transform duration-700 transform origin-bottom-left z-10"
+                     :class="hugging ? '-translate-x-6 -rotate-12' : 'translate-x-8'">🐼</div>
+            </div>
+            
+            <button @click="giveHug()" class="mt-6 bg-white border-2 border-soft-rose text-soft-rose px-8 py-2 rounded-full font-bold hover:bg-soft-rose hover:text-white transition shadow-md">
+                Click to Hug
+            </button>
+        </section>
+
+        <!-- Message in a Bottle Section -->
+        <section class="py-20 px-4 relative overflow-hidden" data-aos="fade-up">
+            <!-- Water Effect Background -->
+            <div class="absolute bottom-0 left-0 w-full h-32 bg-gradient-to-t from-blue-100/50 to-transparent pointer-events-none"></div>
+            
+            <div class="max-w-4xl mx-auto text-center relative z-10" x-data="{ open: false, message: 'My love for you is deeper than the ocean and wider than the sky. 🌊💙' }">
+                <h2 class="font-serif text-3xl text-text-dark mb-12">Message in a Bottle 🍾</h2>
+                
+                <div class="relative h-64 flex items-center justify-center">
+                    <!-- The Bottle -->
+                    <div @click="open = true" 
+                         class="text-8xl cursor-pointer animate-float-bottle transition-all duration-500 filter drop-shadow-xl hover:brightness-110"
+                         :class="open ? 'opacity-0 scale-0' : 'opacity-100'">
+                        🍾
+                    </div>
+                    
+                    <!-- The Message (Scroll) -->
+                    <div x-show="open" 
+                         style="display: none;"
+                         x-transition:enter="transition ease-out duration-1000"
+                         x-transition:enter-start="opacity-0 translate-y-10 scale-50 rotate-12"
+                         x-transition:enter-end="opacity-100 translate-y-0 scale-100 rotate-0"
+                         class="bg-[#fdf6e3] p-8 rounded-sm shadow-2xl max-w-md mx-auto border border-[#d4b483] relative transform -rotate-1">
+                         <div class="absolute -top-3 left-1/2 -translate-x-1/2 w-6 h-6 bg-red-800 rounded-full shadow-inner border border-red-600"></div>
+                         <p class="font-handwritten text-3xl text-gray-800 leading-relaxed" x-text="message"></p>
+                         <button @click.stop="open = false" class="mt-6 text-xs text-gray-400 uppercase tracking-widest hover:text-soft-rose transition">Close Bottle</button>
+                    </div>
+                </div>
+                <p x-show="!open" class="text-blue-300 text-sm animate-pulse mt-4">It washed up just for you...</p>
             </div>
         </section>
 
@@ -539,6 +929,42 @@
             <h1 class="font-script text-6xl md:text-8xl text-gold-accent mb-4 animate-bounce">Happy Birthday!</h1>
             <p class="text-white text-xl font-serif italic">You are my greatest gift.</p>
             <button @click="giftOpened = false" class="mt-12 px-6 py-2 border border-white/30 text-white rounded-full hover:bg-white/10 transition">Close</button>
+        </div>
+
+        <!-- Bouquet Completed Overlay -->
+        <div x-show="bouquetCompleted" 
+             style="display: none;"
+             x-transition:enter="transition ease-out duration-1000"
+             x-transition:enter-start="opacity-0 scale-90"
+             x-transition:enter-end="opacity-100 scale-100"
+             class="fixed inset-0 z-[100] bg-black/90 flex flex-col items-center justify-center text-center p-4 backdrop-blur-sm">
+            
+            <div class="text-[10rem] leading-none mb-8 animate-bounce filter drop-shadow-2xl">💐</div>
+            
+            <h3 class="font-serif text-4xl md:text-5xl text-soft-rose mb-4 font-bold">A Bouquet For You!</h3>
+            <div class="bg-white/90 p-6 rounded-xl border-2 border-dashed border-gold-accent inline-block shadow-2xl transform rotate-1">
+                <p class="text-lg font-bold text-gold-accent uppercase tracking-widest mb-2">Coupon Unlocked</p>
+                <p class="text-gray-800 text-xl">Good for one <strong>REAL Bouquet</strong> 🌹</p>
+                <p class="text-xs text-gray-500 mt-2">Redeemable anytime with me</p>
+            </div>
+            <button @click="bouquetCompleted = false" class="mt-12 px-8 py-3 bg-white/10 border border-white/30 text-white rounded-full hover:bg-white/20 transition font-bold">Yay! ❤️</button>
+        </div>
+
+        <!-- Toast Container -->
+        <div id="toast-container" class="toast-container"></div>
+
+        <!-- Peeking Mascot -->
+        <div class="fixed bottom-0 left-24 z-50 pointer-events-auto" x-data="{ hover: false, msgs: ['Hi there! 👋', 'You look cute! ✨', 'Have a great day! 🌈', 'Sending hugs! 🐻', 'Smile! 📸'], msg: 'Hi there! 👋' }">
+            <div class="relative group" @mouseenter="hover = true; msg = msgs[Math.floor(Math.random() * msgs.length)]" @mouseleave="hover = false">
+                <!-- Speech Bubble -->
+                <div class="absolute bottom-full left-0 mb-2 bg-white px-4 py-2 rounded-2xl rounded-bl-none shadow-lg border-2 border-soft-rose whitespace-nowrap transition-all duration-300 origin-bottom-left"
+                     :class="hover ? 'opacity-100 scale-100' : 'opacity-0 scale-0'">
+                    <p class="font-handwritten text-lg text-text-dark" x-text="msg"></p>
+                </div>
+                <!-- Bear -->
+                <div class="text-6xl md:text-7xl transform transition-transform duration-500 cursor-pointer filter drop-shadow-lg"
+                     :class="hover ? 'translate-y-0' : 'translate-y-1/3'">🐻‍❄️</div>
+            </div>
         </div>
 
     </main>
@@ -589,12 +1015,14 @@
                 
                 // Flower Game Data
                 flowers: [
-                    { id: 1, icon: '🌹', collected: false, x: 20, y: 20 },
-                    { id: 2, icon: '🌷', collected: false, x: 80, y: 20 },
-                    { id: 3, icon: '🌺', collected: false, x: 20, y: 80 },
-                    { id: 4, icon: '🌸', collected: false, x: 80, y: 80 },
-                    { id: 5, icon: '🌻', collected: false, x: 50, y: 10 },
-                    { id: 6, icon: '🌼', collected: false, x: 50, y: 90 },
+                    { id: 1, icon: '🌹', collected: false, startX: 10, startY: 10, endX: 35, endY: 25, rotate: -45 },
+                    { id: 2, icon: '🌷', collected: false, startX: 85, startY: 15, endX: 40, endY: 20, rotate: -25 },
+                    { id: 3, icon: '🌺', collected: false, startX: 15, startY: 80, endX: 45, endY: 15, rotate: -10 },
+                    { id: 4, icon: '🌸', collected: false, startX: 80, startY: 75, endX: 55, endY: 15, rotate: 10 },
+                    { id: 5, icon: '🌻', collected: false, startX: 50, startY: 5, endX: 60, endY: 20, rotate: 25 },
+                    { id: 6, icon: '🌼', collected: false, startX: 50, startY: 90, endX: 65, endY: 25, rotate: 45 },
+                    { id: 7, icon: '🪷', collected: false, startX: 5, startY: 45, endX: 50, endY: 22, rotate: 0 },
+                    { id: 8, icon: '💐', collected: false, startX: 90, startY: 50, endX: 50, endY: 10, rotate: 0 },
                 ],
                 
                 openEnvelope() {
@@ -623,7 +1051,7 @@
                     audio.play().catch(() => {}); // Ignore auto-play errors
 
                     if(this.flowers.every(f => f.collected)) {
-                        setTimeout(() => { this.bouquetCompleted = true; this.fireConfetti(); }, 800);
+                        setTimeout(() => { this.bouquetCompleted = true; this.fireConfetti(); }, 600);
                     }
                 },
 
@@ -792,7 +1220,7 @@
             let score = 0;
             let gameRunning = false;
             let animationId;
-            let player = { x: 0, y: 0, width: 60, height: 60, icon: '🐻' };
+            let player = { x: 0, y: 0, width: 60, height: 60, icon: '🐻‍❄️' };
             let fallingObjects = [];
             let lastTime = 0;
             let spawnTimer = 0;
@@ -869,7 +1297,7 @@
                             }
                         } else {
                             player.icon = '💫';
-                            setTimeout(() => player.icon = '🐻', 500);
+                            setTimeout(() => player.icon = '🐻‍❄️', 500);
                         }
                         fallingObjects.splice(i, 1);
                         continue;
@@ -918,6 +1346,56 @@
             startBtn.addEventListener('click', startGame);
             resetBtn.addEventListener('click', startGame);
         });
+
+        // Click Heart Effect
+        document.addEventListener('click', (e) => {
+            const heart = document.createElement('div');
+            heart.classList.add('click-heart');
+            heart.innerHTML = ['❤️', '💖', '💕', '🌸', '✨'][Math.floor(Math.random() * 5)];
+            heart.style.left = `${e.pageX}px`;
+            heart.style.top = `${e.pageY}px`;
+            heart.style.transform = `rotate(${Math.random() * 40 - 20}deg)`;
+            document.body.appendChild(heart);
+
+            setTimeout(() => heart.remove(), 1000);
+        });
+
+        // Random Love Toasts
+        const toastContainer = document.getElementById('toast-container');
+        const toastMessages = [
+            "You look beautiful today! 🌸",
+            "Don't forget to smile 😊",
+            "I'm so lucky to have you 💖",
+            "You are my sunshine ☀️",
+            "Sending you a virtual hug 🤗",
+            "You're doing amazing! ✨",
+            "Thinking of you... 💕"
+        ];
+
+        function showRandomToast() {
+            const msg = toastMessages[Math.floor(Math.random() * toastMessages.length)];
+            const toast = document.createElement('div');
+            toast.className = 'love-toast';
+            toast.innerHTML = `<span>💌</span> ${msg}`;
+            toastContainer.appendChild(toast);
+            
+            // Trigger reflow for transition
+            void toast.offsetWidth; 
+            toast.classList.add('show');
+
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 500);
+            }, 4000);
+        }
+
+        // Start showing toasts
+        setTimeout(() => {
+            showRandomToast();
+            setInterval(() => {
+                if(Math.random() > 0.4) showRandomToast(); 
+            }, 8000);
+        }, 3000);
     </script>
 </body>
 </html>
